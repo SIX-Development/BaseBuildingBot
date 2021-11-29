@@ -1,5 +1,8 @@
 import express from 'express'
 import { MessageEmbed } from 'discord.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
 const router = express.Router()
 function generateEmbed(title, description, color, arrFieldNames, arrFieldValues) {
     return new Promise((resolve) => {
@@ -25,19 +28,25 @@ function generateEmbed(title, description, color, arrFieldNames, arrFieldValues)
 
 
 export const startServer = client => {
-
-
     const app = express()
     app.use(express.json());
     app.use(express.urlencoded({
         extended: true
     }));
+    app.use(express.static(path.join(path.dirname(fileURLToPath(import.meta.url)), 'public')))
+    app.set('view engine', 'ejs')
+
 
     app.get('/', async (_, res) => {
-        res.sendStatus(403)
+        const title = 'Home'
+        res.render('pages/index', {
+            title: title
+        })
     })
-
-    app.post('/', async (req, res) => {
+    app.get('/api', async (_, res) => {
+        res.sendStatus(404)
+    })
+    app.post('/api', async (req, res) => {
         const data = req.body
         // console.log(data)
         const auth = data.auth
