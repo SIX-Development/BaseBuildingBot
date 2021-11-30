@@ -47,7 +47,7 @@ export const startServer = client => {
         });
     });
     app.get('/api', async (_, res) => {
-        res.sendStatus(404);
+        res.redirect('/');
     });
     app.post('/api', async (req, res) => {
         const data = req.body;
