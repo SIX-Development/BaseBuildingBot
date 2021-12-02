@@ -1,31 +1,9 @@
 import express from 'express';
-import { MessageEmbed } from 'discord.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { generateEmbed } from './lib/generateEmbed.js';
 
 const router = express.Router();
-function generateEmbed(title, description, color, arrFieldNames, arrFieldValues) {
-    return new Promise((resolve) => {
-        if (typeof (arrFieldNames) != 'undefined') {
-            if (arrFieldNames.length == arrFieldValues.length) {
-                const response = new MessageEmbed()
-                    .setColor(color)
-                    .setTitle(title)
-                    .setDescription(description);
-                for (var i = 0; i < arrFieldNames.length; i++) {
-                    response.addField(arrFieldNames[i], arrFieldValues[i]);
-                }
-                resolve(response);
-            }
-        } else {
-            const response = new MessageEmbed()
-                .setTitle(title)
-                .setDescription(description);
-            resolve(response);
-        }
-    });
-}
-
 
 export const startServer = client => {
     const app = express();
@@ -55,15 +33,17 @@ export const startServer = client => {
         const auth = data.auth;
 
         if (process.env.AUTHORIZATION === auth) {
-            const user = data.userid;
+            const user = data.userId;
             const title = data.title;
             const message = data.message;
             const color = data.color;
             const fieldTitles = data.fieldTitles;
             const fieldValues = data.fieldValues;
+            const footer = data.footer;
+            const footerImg = data.footerImg;
             const member = await client.users.fetch(user);
 
-            const response = await generateEmbed(title, message, color, fieldTitles, fieldValues);
+            const response = await generateEmbed(title, message, color, fieldTitles, fieldValues, footer, footerImg);
             member
                 .createDM()
                 .then((DMChannel) => {
